@@ -1,4 +1,5 @@
 const PLAYER = 'X';
+var FIRSTPLACE = true;
 
 class Coords {
   constructor(x, y) {
@@ -18,10 +19,11 @@ function CreateBaseMap(size) {
 }
 
 function Place(newCoords, m, o) {
-  if (o == PLAYER) {
+  if (o == PLAYER || !FIRSTPLACE) {
     oldCoords = GetPlayersCoords(m);
     m[oldCoords.x][oldCoords.y] = '-';
   }
+  FIRSTPLACE = false;
   m[newCoords.x][newCoords.y] = o;
 }
 
@@ -39,21 +41,26 @@ function GetPlayersCoords(map) {
     }
     counter++;
   }
-  coords.y = map[coords.x].indexOf(PLAYER);
+  try {
+    coords.y = map[coords.x].indexOf(PLAYER);
+  } catch (error) {}
   return coords;
 }
 
 function MaxHeight(map) {
-  map.length;
+  return map.length-1;
 }
 
 function MaxWidth(map) {
-  map[0].length;
+  return map[0].length-1;
 }
 
 function CanMoveThere(m, dir) {
   var r = false;
   var coords = GetPlayersCoords(m);
+  if (coords.y < 0 || coords.x < 0) {
+    return r;
+  }
 
   switch (dir) {
     case 0: // top.
@@ -65,7 +72,7 @@ function CanMoveThere(m, dir) {
       break;
 
     case 2: // bottom.
-      r = coords.x != MaxWidth(m);
+      r = coords.x != MaxHeight(m);
       break;
 
     case 3: // left.
@@ -84,19 +91,19 @@ function Move(m, dir) {
     switch (dir) {
       case 0: // Move up.
         coords.x -= 1;
-        Place(coords, dir, PLAYER);
+        Place(coords, m, PLAYER);
         break;
       case 1: // Move right.
         coords.y += 1;
-        Place(coords, dir, PLAYER);
+        Place(coords, m, PLAYER);
         break;
       case 2: // Move down.
         coords.x += 1;
-        Place(coords, dir, PLAYER);
+        Place(coords, m, PLAYER);
         break;
       case 3: // Move left.
         coords.y -= 1;
-        Place(coords, dir, PLAYER);
+        Place(coords, m, PLAYER);
         break;
       default:
         console.debug('You tried to move: ' + dir);
@@ -112,6 +119,22 @@ Place(coords, m, PLAYER);
 c = GetPlayersCoords(m);
 console.debug(c);
 
-Move(m, 0);
-c = GetPlayersCoords(m);
-console.debug(c);
+document.onkeydown = function(e) {
+  switch (e.keyCode) {
+    case 37:
+      Move(m, 3);
+      break;
+    case 38:
+      Move(m, 0);
+      break;
+    case 39:
+      Move(m, 1);
+      break;
+    case 40:
+      Move(m, 2);
+      break;
+    case 80:
+      console.debug(m);
+      break;
+  }
+};
