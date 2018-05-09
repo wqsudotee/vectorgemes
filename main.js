@@ -1,4 +1,6 @@
 const PLAYER = 'X';
+var world = document.getElementById("world");
+var context = world.getContext('2d');
 var FIRSTPLACE = true;
 
 class Coords {
@@ -19,7 +21,7 @@ function CreateBaseMap(size) {
 }
 
 function Place(newCoords, m, o) {
-  if (o == PLAYER || !FIRSTPLACE) {
+  if (o == PLAYER && !FIRSTPLACE) {
     oldCoords = GetPlayersCoords(m);
     m[oldCoords.x][oldCoords.y] = '-';
   }
@@ -113,11 +115,38 @@ function Move(m, dir) {
   }
 }
 
+function DrawMap(map) {
+  var i = 0; 
+  c = GetPlayersCoords(m);
+  for (row in map) {
+    if (row > (c.x - 5) || row < (c.x + 5)){
+      var j = 0;
+      for (cell in map[i]) {
+        if (cell > (c.x - 5) || cell < (c.x + 5)){
+        context.fillStyle = FillStyle(map[i][j]);
+        context.fillRect(j * 50, i * 50, 50, 50);
+        }
+        j += 1;
+      }
+    }
+    i += 1;
+  }
+}
+
+function FillStyle(square){
+  if(square == PLAYER){
+    return 'rgb(200, 0, 0)';
+  };
+  return 'rgb(0, 0, 200)';
+}
+
 m = CreateBaseMap(10);
-var coords = new Coords(4, 9);
+var coords = new Coords(4, 4);
 Place(coords, m, PLAYER);
 c = GetPlayersCoords(m);
 console.debug(c);
+DrawMap(m);
+
 
 document.onkeydown = function(e) {
   switch (e.keyCode) {
@@ -137,4 +166,5 @@ document.onkeydown = function(e) {
       console.debug(m);
       break;
   }
+  DrawMap(m);
 };
